@@ -2,6 +2,7 @@
 
 from rest_framework import serializers
 from .models import Pecas
+import mimetypes
 
 # =================================================================================
 
@@ -28,7 +29,7 @@ class PecasSerializer(serializers.ModelSerializer):
 
 
 
-    def validacao_preco(self, value):
+    def validate_preco(self, value):
         """
         Valida o campo 'preco'.
 
@@ -46,7 +47,7 @@ class PecasSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Preço não pode ser negativo!")
         return value
 
-    def validacao_quantidade(self, value):
+    def validate_quantidade(self, value):
         """
         Valida o campo 'quantidade'.
 
@@ -66,3 +67,33 @@ class PecasSerializer(serializers.ModelSerializer):
     
 # =================================================================================
 
+class CSVSerializer(serializers.Serializer):
+    """
+    Serializer dos arquivos CSV enviados via API.
+
+    Campos:
+        file (FileField): Arquivo enviado pelo usuário.
+
+    Validações:
+        - O arquivo deve ter extensão .csv.
+        - O arquivo deve ter MIME type -> text/csv ou application/vnd.ms-excel.
+    
+    Obs:
+        MIME Type é um identificador padrão de formato dos arquivos, estamos utilizando a Bib mimetypes para fazer essa verificação.
+    """
+
+    file = serializers.FileField()
+
+    def validate_file(self, value):
+        if not value.name.endswith('.csv'):
+            raise serializers.ValidationError("O arquivo deve ser .csv")
+
+        mime, _ = mimetypes.guess_type(value.name)
+        value.seek(0)  # Volta o ponteiro do arquivo para o início
+        if mime != 'text/csv' and mime != 'application/vnd.ms-excel': # o Tipo CSV/XLSX/XLS pode ter esses dois MIME types
+            # Ref: https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Guides/MIME_types/Common_types
+            raise serializers.ValidationError("Arquivo inválido. Esperado CSV.")
+        
+        return value
+
+# =================================================================================
