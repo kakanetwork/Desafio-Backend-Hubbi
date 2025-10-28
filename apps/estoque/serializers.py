@@ -3,6 +3,9 @@
 from rest_framework import serializers
 from .models import Pecas
 import mimetypes
+import logging
+
+logger = logging.getLogger('apps.estoque')
 
 # =================================================================================
 
@@ -86,14 +89,17 @@ class CSVSerializer(serializers.Serializer):
 
     def validate_file(self, value):
         if not value.name.endswith('.csv'):
+            logger.error(f"Arquivo Erro: extensão inválida. Recebido: {value.name}")
             raise serializers.ValidationError("O arquivo deve ser .csv")
 
         mime, _ = mimetypes.guess_type(value.name)
         value.seek(0)  # Volta o ponteiro do arquivo para o início
         if mime != 'text/csv' and mime != 'application/vnd.ms-excel': # o Tipo CSV/XLSX/XLS pode ter esses dois MIME types
+            logger.error(f"Arquivo Erro: MimeType inválida. Recebido: {mime}")
             # Ref: https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Guides/MIME_types/Common_types
             raise serializers.ValidationError("Arquivo inválido. Esperado CSV.")
-        
+            
+        logger.debug(f"Arquivo CSV validado: {value.name}")
         return value
 
 # =================================================================================

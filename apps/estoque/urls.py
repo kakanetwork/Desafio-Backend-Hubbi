@@ -10,8 +10,8 @@ router = DefaultRouter() # Cria um roteador padrão do DRF (Get, Post, Put, Dele
 router.register(r'pecas', PecasView, basename='pecas')
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('pecas/upload/', CSVView.as_view(), name='upload_csv')
+    path('pecas/upload-csv/', CSVView.as_view(), name='upload_csv'),
+    path('', include(router.urls))
 
 ]
 

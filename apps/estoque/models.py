@@ -25,8 +25,27 @@ class Pecas(models.Model):
     criado_data = models.DateTimeField(auto_now_add=True)
     atualizado_data = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        """
+        Utiliza do método save() para realizar algumas:
+        Validações:
+            - Preço não pode ser negativo.
+            - Quantidade não pode ser negativa.
+        """
+
+        if self.preco < 0:
+            raise ValueError("Preço não pode negativo.")
+        if self.quantidade < 0:
+            raise ValueError("Quantidade não pode negativa.")
+        
+        super().save(*args, **kwargs)
+
+
 
     def __str__(self):
+        """
+            Representação em string da peça - Utilizamos na Admin.
+        """
         return f"{self.nome} ({self.quantidade} unds) - R$ {self.preco}"
     
 # =================================================================================
