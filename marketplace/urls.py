@@ -13,9 +13,8 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-    # Apps
-    path('api/estoque/', include('apps.estoque.urls')),  # sem namespace
-    path('api/usuarios/', include('apps.usuarios.urls')),  # sem namespace
+    path('api/estoque/', include('apps.estoque.urls')),
+    path('api/usuarios/', include('apps.usuarios.urls')),
 ]
 
 # =================================================================================
