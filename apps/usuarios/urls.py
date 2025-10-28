@@ -7,7 +7,7 @@ from .views import UsuariosView
 # =================================================================================
 
 router = DefaultRouter()
-router.register('usuarios', UsuariosView, basename='usuarios')
+router.register('', UsuariosView, basename='usuarios')
 
 urlpatterns = [
     path('', include(router.urls)),
