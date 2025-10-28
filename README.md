@@ -155,19 +155,84 @@ docker compose exec web python manage.py shell
 
 ## 🌐 Acessando a Aplicação
 
-- **API REST:** [`http://localhost:8000/api/`](http://localhost:8000/api/)
-- **Painel Admin:** [`http://localhost:8000/admin/`](http://localhost:8000/admin/)
+Após subir todos os containers e aplicar as migrations, o sistema estará disponível em:
 
-Autenticação via JWT:
+* **Painel Administrativo (Django Admin):**
+  👉 [`http://localhost:8000/admin/`](http://localhost:8000/admin/)
+  Use as credenciais criadas com o comando `createsuperuser`.
+
+
+#### 🔐 Autenticação via API (JWT)
+
+Para utilizar a API protegida, primeiro obtenha um token JWT:
+
 ```bash
-POST /api/token/
+POST http://localhost:8000/api/token/
 {
   "username": "admin",
-  "password": "senha"
+  "password": "sua_senha"
+}
+```
+  Use as credenciais criadas com o comando `createsuperuser`.
+
+A resposta conterá um `access` e um `refresh` token.
+Use o token de acesso nos headers das próximas requisições:
+
+```
+Authorization: Bearer <seu_token>
+```
+
+#### 🔄 Atualizar Token de Acesso
+
+Quando o token de acesso expirar, você pode gerar um novo usando o **token de refresh**:
+
+```bash
+POST http://localhost:8000/api/token/refresh/
+Content-Type: application/json
+{
+  "refresh": "<seu_refresh_token>"
 }
 ```
 
-Depois envie `Authorization: Bearer <token>` no header.
+A resposta será:
+
+```json
+{
+  "access": "<novo_access_token>"
+}
+```
+
+#### 📦 Endpoints Principais
+
+##### 🧰 Peças (`/api/estoque/pecas/`)
+
+|   Método   | Endpoint                         | Descrição                                            |
+| :--------: | :------------------------------- | :--------------------------------------------------- |
+|   **GET**  | `/api/estoque/pecas/`            | Lista todas as peças disponíveis.                    |
+|   **GET**  | `/api/estoque/pecas/{id}/`       | Detalha uma peça específica.                         |
+|  **POST**  | `/api/estoque/pecas/`            | Cria uma nova peça *(somente admin)*.                |
+|  **PATCH** | `/api/estoque/pecas/{id}/`       | Atualiza os dados de uma peça *(somente admin)*.     |
+| **DELETE** | `/api/estoque/pecas/{id}/`       | Remove uma peça *(somente admin)*.                   |
+|  **POST**  | `/api/estoque/pecas/upload-csv/` | Faz upload de um arquivo CSV para cadastro em massa. |
+
+##### 👤 Usuários (`/api/usuarios/`)
+
+|  Método  | Endpoint              | Descrição                                                                 |
+| :------: | :-------------------- | :------------------------------------------------------------------------ |
+|  **GET** | `/api/usuarios/`      | Lista todos os usuários *(apenas admin)*.                                 |
+|  **GET** | `/api/usuarios/{id}/` | Retorna os dados de um usuário específico *(admin ou o próprio usuário)*. |
+
+---
+
+#### 💡 Dica
+
+* Para testar a API rapidamente, use [Insomnia](https://insomnia.rest/) ou [Postman](https://www.postman.com/).
+* Ou via terminal, com [HTTPie](https://httpie.io/):
+
+```bash
+http GET http://localhost:8000/api/estoque/pecas/ "Authorization:Bearer <seu_token>"
+```
+
 
 ---
 
@@ -196,7 +261,6 @@ Execute dentro do container principal (`web`):
 ```bash
 docker compose exec web pytest -q --disable-warnings
 ```
-
 
 
 ---
