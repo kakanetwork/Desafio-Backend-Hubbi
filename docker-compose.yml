@@ -1,0 +1,57 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    container_name: db
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  web:
+    build: .
+    container_name: django
+    command: # default roda Django via entrypoint
+    volumes:
+      - ./:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env
+
+  celery_worker:
+    build: .
+    command: celery_worker
+    depends_on:
+      - web
+      - redis
+      - db
+    env_file:
+      - .env
+
+  celery_beat:
+    build: .
+    command: celery_beat
+    depends_on:
+      - web
+      - redis
+      - db
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:

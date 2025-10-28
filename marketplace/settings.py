@@ -83,25 +83,16 @@ WSGI_APPLICATION = 'marketplace.wsgi.application'
 
 # Utilize as variáveis de ambiente para configurar o banco de dados -> Ou mantenha os padrões default para desenvolvimento local, já configurado:
 
-# SQLITE - Desenvolvimento local (tEMPorário)
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME', default='autoparts_db'),
+        'USER': config('DB_USER', default='postgres'),
+        'PASSWORD': config('DB_PASSWORD', default='postgres'),
+        'HOST': config('DB_HOST', default='db'),
+        'PORT': config('DB_PORT', default='5432'),
     }
 }
-
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': config('DB_NAME', default='autoparts_db'),
-#         'USER': config('DB_USER', default='postgres'),
-#         'PASSWORD': config('DB_PASSWORD', default='postgres'),
-#         'HOST': config('DB_HOST', default='localhost'),
-#         'PORT': config('DB_PORT', default='5432'),
-#     }
-# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -164,9 +155,11 @@ REST_FRAMEWORK = {
 
 # Config do celery
 CELERY_TIMEZONE = 'America/Sao_Paulo'
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = config('REDIS_URL', default='redis://redis:6379/0')
+CELERY_RESULT_BACKEND = config('REDIS_URL', default='redis://redis:6379/0')
 CELERY_ENABLE_UTC = False
+CELERY_TASK_ALWAYS_EAGER = True 
+CELERY_TASK_EAGER_PROPAGATES = True
 
 # =================================================================================
 
